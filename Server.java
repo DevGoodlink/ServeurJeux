@@ -31,7 +31,12 @@ class Server extends Thread{
 		new Server().start();
         System.out.println("     Lancement du serveur par le main   ");
     }
-
+/**
+ * La classe Game représente un jeu qui se lance à chaque connexion d'un client
+ * Chaque jeu a sa propre socket pour communiquer avec le joueur
+ * Un objet joueur est associé à  chaque jeu
+ * 
+ */
     class Game extends Thread {
         private Socket socket;
         Joueur j;
@@ -82,8 +87,13 @@ class Server extends Thread{
                     }
                     if (req.intent.equalsIgnoreCase("signup")){
                         Joueur j=LoginAndRegister(false,req.getJoueur());
-                        resp=new Requete(j,null,"signup-success", temps);
-                        this.j=j;
+                        if(j!=null){
+                            resp=new Requete(j,null,"signup-success", temps);
+                            this.j=j;
+                        }else{
+                            resp=new Requete(null,null,"signup-fail", temps);
+                        }
+                        
                     }
                     if(req.intent.equalsIgnoreCase("start")){
                         this.mot=genererMot();
@@ -188,16 +198,27 @@ class Server extends Thread{
      * @param j Objet joueur
      * @return Joureur
      */
-    public static synchronized Joueur LoginAndRegister(boolean l,Joueur j) {
-        System.out.println("Login launched for j = "+j.nom);
+    public static synchronized Joueur LoginAndRegister(boolean l,Joueur j)throws Exception {
+        
         List<Joueur> lst = new ArrayList<>();
         //ouverture du fichier players.txt pour lecture
-        FileInputStream fis=new FileInputStream("players.txt");
-        ObjectInputStream ois= new ObjectInputStream(fis);
-        lst=(List<Joueur>)ois.readObject();
-        ois.close();
-        fis.close();
+        File f = new File("players.txt");
+        if(f.exists() && !f.isDirectory()) { 
+            FileInputStream fis=new FileInputStream("players.txt");
+            ObjectInputStream ois= new ObjectInputStream(fis);
+            lst=(List<Joueur>)ois.readObject();
+            ois.close();
+            fis.close();
+        }else{
+            //création du fichier
+            FileOutputStream fos=new FileOutputStream("players.txt");
+            ObjectOutputStream oos= new ObjectOutputStream(fos);
+            oos.writeObject(lst);
+            oos.close();
+            fos.close();
+        }
         if(l){//login
+            System.out.println("Login launched for j = "+j.nom);
             Joueur foundJoueur=null;
             foundJoueur = lst.stream().filter(e->e.equals(j)).findFirst().get();
             if(foundJoueur==null){
@@ -207,6 +228,7 @@ class Server extends Thread{
             System.out.println("[success authentification]");               
             return foundJoueur;//retourn l'objet trouvé dans la base authentification avec succés
         }else{
+            System.out.println("Signup launched for j = "+j.nom);
             //enregistrement
             //test si le joueur est présent
             boolean joueurPresent = lst.stream().filter(e->e.nom.equalsIgnoreCase(j.nom) && e.prenom.equalsIgnoreCase(j.prenom)).findFirst().isPresent();

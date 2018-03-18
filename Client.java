@@ -18,46 +18,28 @@ class Client{
             toServer.writeObject(new Requete(null, "Hi I am a client could I play?",null,0L));
             Requete rep = (Requete)fromServer.readObject();
             System.out.println(rep.answer);
-            if(rep.intent.contains("first")){
-                BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-                Requete req = new Requete();
-                System.out.println("0-inscription, 1-Authentification");
-                int a = Integer.parseInt(br.readLine());
-                if(a==0){
-                   // do{
-                        Joueur j = signUp();
-                        req=new Requete(j, "signup", "", 0L);
-                        //System.out.println("envoi du joueur j="+j);
-                   // }while(!rep.answer.equalsIgnoreCase("signup-success"));
-                    
-                }else if(a==1){
-                    //do{
-                        Joueur j = login();
-                        req=new Requete(j, "login", "", 0L);
-
-                        // System.out.println("envoi du joueur j="+j);
-
-                   // }while(!rep.answer.equalsIgnoreCase(""));
-                   
-                }
-                toServer.writeObject(req);
-                Thread.sleep(5000);
-                Thread.currentThread().join();
-                rep = (Requete)fromServer.readObject();
-                if(rep.answer.equalsIgnoreCase("login-success")){
-                    System.out.println(rep.getJoueur());
-                }
-
-
-
-
-                
-                /*if(rep.intent.compareTo("signup-success")==0){
-                    System.err.println("Good! licence = "+rep.getJoueur().licence);
-                }*/
-
-            //toServer.writeObject(req);
-            }
+            //while((rep = (Requete)fromServer.readObject())!=null){
+                    if(rep.intent.contains("first")){
+                        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+                        Requete req = new Requete();
+                        System.out.println("0-inscription, 1-Authentification");
+                        int a = Integer.parseInt(br.readLine());
+                        if(a==0){
+                                Joueur j = signUp();
+                                req=new Requete(j, "signup", "", 0L);
+                        }else if(a==1){
+                                Joueur j = login();
+                                req=new Requete(j, "login", "", 0L);
+                        }
+                        toServer.writeObject(req);
+                        Thread.sleep(2000);
+                        //Thread.currentThread().join();
+                        
+                        if(rep.answer.equalsIgnoreCase("login-success")){
+                            System.out.println(rep.getJoueur());
+                        }
+                    }
+            //}
             
            /* while(( rep = (Requete)fromServer.readObject()) != null){
                 System.out.println("[Server] says : -----------------------\n"+rep.answer);

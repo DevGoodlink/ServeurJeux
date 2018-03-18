@@ -5,7 +5,7 @@ class Joueur implements Serializable{
     int licence=0;
     int score;
     int nbrJeux=0;
-    
+    boolean CONNECTED = false;
     public Joueur() {
     }
     public Joueur(String nom,String prenom,int licence){
