@@ -18,11 +18,16 @@ class Joueur implements Serializable{
     public String toString() {
         return "nom : "+this.nom+" prenom "+this.prenom+" score = "+this.score +" nombre de jeux = "+nbrJeux;
     }
-    
+    /**
+     * @return the score
+     */
+    public int getScore() {
+        return score;
+    }
     @Override
     public boolean equals(Object obj) {
         if(! (obj instanceof Joueur)) return false;
         Joueur j = (Joueur)obj;
-        return this.licence==obj.licence;
+        return this.licence==j.licence;
     }
 }
